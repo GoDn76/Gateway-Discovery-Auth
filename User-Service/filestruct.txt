@@ -1,0 +1,48 @@
+user-service/
+├── pom.xml
+└── src/
+    └── main/
+        ├── java/
+        │   └── org/
+        │       └── godn/
+        │           └── userservice/
+        │               │
+        │               ├── config/
+        │               │   └── SecurityConfig.java
+        │               │
+        │               ├── controller/
+        │               │   (This is our next step - AuthController.java)
+        │               │
+        │               ├── model/
+        │               │   ├── AuthProvider.java
+        │               │   ├── PasswordResetToken.java
+        │               │   ├── User.java
+        │               │   └── VerificationToken.java
+        │               │
+        │               ├── payload/
+        │               │   ├── ApiResponseDto.java
+        │               │   ├── AuthResponseDto.java
+        │               │   ├── EmailDto.java
+        │               │   ├── GoogleLoginDto.java
+        │               │   ├── LoginDto.java
+        │               │   ├── OtpVerificationDto.java
+        │               │   ├── RegisterDto.java
+        │               │   ├── ResetPasswordDto.java
+        │               │   ├── UpdateProfileDto.java
+        │               │   └── UserProfileDto.java
+        │               │
+        │               ├── repository/
+        │               │   ├── PasswordResetTokenRepository.java
+        │               │   ├── UserRepository.java
+        │               │   └── VerificationTokenRepository.java
+        │               │
+        │               ├── service/
+        │               │   ├── AuthService.java
+        │               │   ├── AuthServiceImpl.java
+        │               │   ├── EmailService.java
+        │               │   └── EmailServiceImpl.java
+        │               │
+        │               └── UserServiceApplication.java
+        │
+        └── resources/
+            └── application.yml

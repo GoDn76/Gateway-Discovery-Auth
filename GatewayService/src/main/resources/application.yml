@@ -1,0 +1,21 @@
+server:
+  port: 9090
+
+spring:
+  cloud:
+    gateway:
+      server: # <-- Add this
+        webflux: # <-- Add this
+          routes: # <-- Routes are now nested under here
+            - id: user-service-route
+              uri: lb://user-service
+              predicates:
+                - Path=/users/**
+              filters:
+                - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      # This address is still correct
+      defaultZone: http://localhost:8761/eureka/

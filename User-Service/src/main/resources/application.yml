@@ -1,0 +1,70 @@
+# -----------------------------------------------------------------
+# SERVICE PORT & NAME
+# -----------------------------------------------------------------
+server:
+  port: 0 # '0' tells Spring Boot to find a random, free port.
+  # This is microservice best practice.
+
+spring:
+  # -----------------------------------------------------------------
+  # DATABASE (POSTGRESQL) & JPA CONFIGURATION
+  # -----------------------------------------------------------------
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chikitadb #
+    username: ${DB_USERNAME} # Your Postgres username
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update # Automatically updates the schema. Good for development.
+    show-sql: true # Lets you see the generated SQL queries in the console
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# -----------------------------------------------------------------
+# EMAIL SENDER CONFIGURATION (Example using Gmail)
+# -----------------------------------------------------------------
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: "9ba567001@smtp-brevo.com"
+    password: ${MAIL_PASSWORD}
+    from: ${SENDER_EMAIL}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  security:
+    oauth2:
+          client:
+            registration:
+              google:
+                client-id: ${GOOGLE_CLIENT_ID}
+                client-secret: ${GOOGLE_CLIENT_SECRET}
+                scope:
+                  - email
+                  - profile
+
+# -----------------------------------------------------------------
+# EUREKA CLIENT CONFIGURATION
+# -----------------------------------------------------------------
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true # Use IP address instead of hostname
+    # This forces a unique ID (e.g., "User-Service:abc123")
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+
+  # -----------------------------------------------------------------
+  # APPLICATION-SPECIFIC PROPERTIES (FOR JWT)
+  # -----------------------------------------------------------------
+app: # <-- ✅ CORRECT: Top level, aligned with spring, server, etc.
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 86400000

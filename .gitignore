@@ -1,0 +1,23 @@
+# --- Secrets (NEVER UPLOAD THESE) ---
+.env
+**/.env
+*.env
+
+# --- Java / Maven Build Files ---
+target/
+**/target/
+*.class
+*.jar
+*.war
+
+# --- IDE Settings (Optional but recommended) ---
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
