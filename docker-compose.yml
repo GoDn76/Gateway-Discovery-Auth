@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # --- 1. SERVICE DISCOVERY (Eureka) ---
+  service-discovery:
+    # ⚠️ FIX: Match the folder name "ServiceDiscovery" exactly
+    build: 
+      context: ./ServiceDiscovery
+      dockerfile: dockerfile  # Your screenshot shows lowercase 'd'
+    container_name: service-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      - JAVA_OPTS=-Xmx256m -Xms256m
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - symptom-network
+
+  # --- 2. API GATEWAY ---
+  gateway-service:
+    # ⚠️ FIX: Match the folder name "GatewayService" exactly
+    build: 
+      context: ./GatewayService
+      dockerfile: dockerfile # Your screenshot shows lowercase 'd'
+    container_name: gateway-service
+    ports:
+      - "9090:9090"
+    environment:
+      - JAVA_OPTS=-Xmx256m -Xms256m
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-discovery:8761/eureka/
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+    networks:
+      - symptom-network
+
+networks:
+  symptom-network:
+    driver: bridge
