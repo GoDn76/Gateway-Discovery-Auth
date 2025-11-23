@@ -1,23 +1,21 @@
-version: '3.8'
-
 services:
   # --- 1. SERVICE DISCOVERY (Eureka) ---
   service-discovery:
-    # ⚠️ FIX: Match the folder name "ServiceDiscovery" exactly
     build: 
       context: ./ServiceDiscovery
-      dockerfile: dockerfile  # Your screenshot shows lowercase 'd'
+      dockerfile: Dockerfile
     container_name: service-discovery
     ports:
-      - "8761:8761"
+      - "8761:8761" # Exposes Eureka to the VM's localhost
     environment:
       - JAVA_OPTS=-Xmx256m -Xms256m
+    # Use a simpler healthcheck or ensure 'curl' is installed in your Dockerfile
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "8761"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 60s
+      start_period: 30s
     networks:
       - symptom-network
 
@@ -25,15 +23,18 @@ services:
   gateway-service:
     build: 
       context: ./GatewayService
-      dockerfile: dockerfile  # Your screenshot shows lowercase 'd'
+      dockerfile: Dockerfile
     container_name: gateway-service
-    network_mode: "host"  # <--- Enables access to SSH Tunnel
+    # 🚀 HOST MODE: This allows Gateway to see the SSH Tunnel on localhost:8081
+    network_mode: "host" 
     environment:
       - JAVA_OPTS=-Xmx256m -Xms256m
-      # 1. Tell Gateway to find Eureka on the VM's localhost (since Eureka exposes port 8761)
+      # Finds Eureka on VM Localhost
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
-      # 2. (Optional) Force Gateway to run on Port 80 instead of 9090
+      # Ensure Gateway application.yml has: server.port: ${SERVER_PORT:8080}
       - SERVER_PORT=80 
+      # Ensure your JWT Secret is passed here if using .env
+      - JWT_SECRET=${JWT_SECRET} 
     depends_on:
       service-discovery:
         condition: service_healthy
