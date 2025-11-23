@@ -9,13 +9,6 @@ services:
       - "8761:8761" # Exposes Eureka to the VM's localhost
     environment:
       - JAVA_OPTS=-Xmx256m -Xms256m
-    # Use a simpler healthcheck or ensure 'curl' is installed in your Dockerfile
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8761/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
     networks:
       - symptom-network
 
