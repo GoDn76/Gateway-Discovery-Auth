@@ -8,9 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-// NOTE: This must match the path the Gateway sends.
-// If Gateway path is /api/user/** and NO StripPrefix filter, use "/api/user" here.
-@RequestMapping("/api/user")
+@RequestMapping("/")
 public class ProfileController {
 
     private final ProfileService profileService;
