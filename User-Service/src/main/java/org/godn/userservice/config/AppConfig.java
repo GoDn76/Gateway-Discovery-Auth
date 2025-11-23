@@ -21,32 +21,34 @@ public class AppConfig {
         this.userRepository = userRepository;
     }
 
-    // --- Moved from SecurityConfig ---
+    /**
+     * This is used by AuthenticationManager during LOGIN to check if the user exists
+     * and if the password matches.
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> {
             org.godn.userservice.model.User appUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+            // Map our custom User entity to Spring Security's UserDetails
             return new org.springframework.security.core.userdetails.User(
                     appUser.getEmail(),
                     appUser.getPassword(),
-                    appUser.getEmailVerified(),
-                    true,
-                    true,
-                    true,
-                    Collections.emptyList()
+                    appUser.getEmailVerified(), // Enabled (only if email verified)
+                    true, // Account Non Expired
+                    true, // Credentials Non Expired
+                    true, // Account Non-Locked
+                    Collections.emptyList() // Authorities/Roles
             );
         };
     }
 
-    // --- Moved from SecurityConfig ---
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // --- Moved from SecurityConfig ---
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

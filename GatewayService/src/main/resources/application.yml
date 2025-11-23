@@ -4,15 +4,25 @@ server:
 spring:
   cloud:
     gateway:
-      server: # <-- Add this
-        webflux: # <-- Add this
-          routes: # <-- Routes are now nested under here
+      server:
+        webflux:
+          routes:
             - id: user-service-route
               uri: lb://user-service
               predicates:
-                - Path=/users/**
+                - Path=/auth/**
               filters:
                 - StripPrefix=1
+
+            - id: user-service-protected
+              uri: lb://user-service
+              predicates:
+                - Path=/user/**
+              filters:
+                - StripPrefix=1
+                - AuthenticationFilter
+
+
 
 eureka:
   client:

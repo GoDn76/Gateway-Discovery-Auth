@@ -6,6 +6,7 @@ import org.godn.userservice.payload.UserProfileDto;
 import org.godn.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
 
 @Service
 public class ProfileServiceImpl implements  ProfileService {
@@ -16,10 +17,9 @@ public class ProfileServiceImpl implements  ProfileService {
         this.userRepository = userRepository;
     }
     @Override
-    public UserProfileDto getUserProfile(String email) {
-        User user = userRepository.findByEmail(email)
+    public UserProfileDto getUserProfile(String id) {
+        User user = userRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         return mapToDto(user);
     }
 

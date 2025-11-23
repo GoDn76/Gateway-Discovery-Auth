@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------
 # SERVICE PORT & NAME
-# -----------------------------------------------------------------
+# -------------------A----------------------------------------------
 server:
   port: 8080
   forward-headers-strategy: framework
@@ -13,6 +13,10 @@ spring:
     url: ${DB_URL} #
     username: ${DB_USERNAME} # Your Postgres username
     password: ${DB_PASSWORD}
+    hikari:
+      data-source-properties:
+        prepareThreshold: 0
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update # Automatically updates the schema. Good for development.
@@ -47,6 +51,8 @@ spring:
                 scope:
                   - email
                   - profile
+  application:
+    name: user-service
 
 # -----------------------------------------------------------------
 # EUREKA CLIENT CONFIGURATION
@@ -81,3 +87,6 @@ springdoc:
     configUrl: /users/v3/api-docs/swagger-config
     url: /users/v3/api-docs
     disable-swagger-default-url: true
+
+name:
+  application: ${APP_NAME}

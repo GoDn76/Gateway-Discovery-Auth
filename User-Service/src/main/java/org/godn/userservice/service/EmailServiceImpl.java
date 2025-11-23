@@ -9,11 +9,15 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final String fromEmail;
+    private final String appName;
 
     public EmailServiceImpl(JavaMailSender mailSender,
-                            @Value("${spring.mail.from}") String fromEmail) {
+                            @Value("${spring.mail.from}") String fromEmail, // Inject 'from' email address from application properties
+                            @Value("${name.application}") String appName // Inject application name from application properties
+    ) {
         this.mailSender = mailSender;
-        this.fromEmail = fromEmail; // <-- Save the "from" address
+        this.fromEmail = fromEmail;
+        this.appName = appName;
     }
 
     /**
@@ -21,9 +25,9 @@ public class EmailServiceImpl implements EmailService {
      */
     @Override
     public void sendVerificationEmail(String to, String token) {
-        String subject = "Chikitsalaya - Email Verification";
+        String subject = appName + " - Email Verification";
 
-        String messageText = "Thank you for registering for Chikitsalaya.\n\n" +
+        String messageText = "Thank you for registering for "+appName+".\n\n" +
                 "Your email verification code is: " + token + "\n\n" +
                 "This code will expire in 15 minutes.";
 
@@ -35,7 +39,7 @@ public class EmailServiceImpl implements EmailService {
      */
     @Override
     public void sendPasswordResetEmail(String to, String token) {
-        String subject = "Chikitsalaya - Password Reset Request";
+        String subject = appName + " - Password Reset Request";
 
         String messageText = "You have requested to reset your password.\n\n" +
                 "Your password reset code is: " + token + "\n\n" +
@@ -51,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
     private void sendSimpleEmail(String to, String subject, String text) {
         SimpleMailMessage email = new SimpleMailMessage();
 
-        email.setFrom(fromEmail); // <-- ✅ THE FIX: Set the "From" address
+        email.setFrom(fromEmail);
         email.setTo(to);
         email.setSubject(subject);
         email.setText(text);
