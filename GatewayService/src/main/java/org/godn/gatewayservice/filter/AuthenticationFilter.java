@@ -30,60 +30,78 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            // 1. Check if the request has the Authorization header
-            if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                return onError(exchange, "Missing Authorization Header");
+            // 0. Check Configuration: Is security enabled for this route?
+            if (!config.isEnabled()) {
+                return chain.filter(exchange); // Skip security check
             }
 
-            String authHeader = Objects.requireNonNull(exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION)).getFirst();
+            // 1. Check if the request has the Authorization header
+            if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                return onError(exchange, "Missing Authorization Header", HttpStatus.UNAUTHORIZED);
+            }
+
+            // 2. Extract the Header
+            // Note: using Objects.requireNonNull to avoid NullPointerException, though containsKey check usually prevents this.
+            String authHeader = Objects.requireNonNull(exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION)).get(0);
 
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                // 2. Remove the "Bearer " prefix to get the raw token
+                // 3. Remove the "Bearer " prefix to get the raw token
                 authHeader = authHeader.substring(7);
             } else {
-                return onError(exchange, "Invalid Authorization Header Format");
+                return onError(exchange, "Invalid Authorization Header Format", HttpStatus.UNAUTHORIZED);
             }
 
             try {
-                // 3. Validate the Token (Signature & Expiration)
-                // If invalid, this will throw an exception, caught below.
+                // 4. Validate the Token (Signature & Expiration)
                 jwtUtil.validateToken(authHeader);
 
-                // 4. Extract the User ID from the token
+                // 5. Extract the User ID from the token
                 String userId = jwtUtil.extractUserId(authHeader);
 
-                // 5. Mutate the request to add the 'X-User-Id' header
-                // This effectively "logs in" the user for the downstream services (Upload/User Service)
+                // 6. Mutate the request to add the 'X-User-Id' header
+                // This allows downstream services to know WHO the user is without re-validating.
                 ServerHttpRequest request = exchange.getRequest().mutate()
                         .header("X-User-Id", userId)
                         .build();
 
-                // 6. Continue the filter chain with the modified request
+                // 7. Forward the modified request
                 return chain.filter(exchange.mutate().request(request).build());
 
             } catch (Exception e) {
-                // 7. Token validation failed
-                System.err.println("Invalid Token Access Attempt: " + e.getMessage());
-                return onError(exchange, "Invalid Access Token");
+                // 8. Token validation failed
+                // Log it for debugging (optional) but return a clean error to client
+                // System.err.println("Invalid Token: " + e.getMessage());
+                return onError(exchange, "Invalid Access Token", HttpStatus.UNAUTHORIZED);
             }
         };
     }
 
     /**
-     * Custom Error Handler to return a nice JSON response instead of a blank 401 page.
+     * Custom Error Handler to return a nice JSON response instead of a blank error page.
      */
-    private Mono<Void> onError(ServerWebExchange exchange, String err) {
+    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.setStatusCode(httpStatus);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        String jsonResponse = String.format("{\"error\": \"%s\", \"status\": %d}", err, HttpStatus.UNAUTHORIZED.value());
+        String jsonResponse = String.format("{\"error\": \"%s\", \"status\": %d}", err, httpStatus.value());
 
         DataBuffer buffer = response.bufferFactory().wrap(jsonResponse.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Flux.just(buffer));
     }
 
+    /**
+     * Configuration class to pass settings from application.yml
+     */
     public static class Config {
-        // Put any configuration properties here if you need them later
+        private boolean enabled = true; // Default is secure
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 }
