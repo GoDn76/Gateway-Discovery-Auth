@@ -63,7 +63,7 @@ eureka:
     service-url:
       defaultZone: http://godn-gw.duckdns.org:8761/eureka/
   instance:
-#    prefer-ip-address: true # Use IP address instead of hostname
+##    prefer-ip-address: true # Use IP address instead of hostname
     # This forces a unique ID (e.g., "User-Service:abc123")
     hostname: localhost # <--- Trick Eureka into using the tunnel
     non-secure-port: 8080
