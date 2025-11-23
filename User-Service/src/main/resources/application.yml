@@ -3,13 +3,14 @@
 # -----------------------------------------------------------------
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 spring:
   # -----------------------------------------------------------------
   # DATABASE (POSTGRESQL) & JPA CONFIGURATION
   # -----------------------------------------------------------------
   datasource:
-    url: jdbc:postgresql://localhost:5432/chikitadb #
+    url: ${DB_URL} #
     username: ${DB_USERNAME} # Your Postgres username
     password: ${DB_PASSWORD}
   jpa:
@@ -26,7 +27,7 @@ spring:
   mail:
     host: smtp-relay.brevo.com
     port: 587
-    username: "9ba567001@smtp-brevo.com"
+    username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     from: ${SENDER_EMAIL}
     properties:
@@ -71,3 +72,12 @@ app: # <-- ✅ CORRECT: Top level, aligned with spring, server, etc.
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    # This tells Swagger: "When you look for config, look RELATIVE to the current path"
+    configUrl: /users/v3/api-docs/swagger-config
+    url: /users/v3/api-docs
+    disable-swagger-default-url: true

@@ -18,4 +18,4 @@ eureka:
   client:
     service-url:
       # This address is still correct
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+      defaultZone: ${EUREKA_SERVER_URL:http://godn-gw.duckdns.org:8761/eureka/}
