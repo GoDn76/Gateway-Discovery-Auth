@@ -37,18 +37,13 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
-        // We can add extra information to the token (claims)
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", user.getEmail());
-        claims.put("name", user.getName());
-        // Add any other non-sensitive info you might need
-
         return Jwts.builder()
-                .setSubject(user.getId().toString()) // The "subject" is the User's ID
-                .setClaims(claims)                   // Add our custom claims
+                .setSubject(user.getId().toString()) // Set Subject
+                .claim("email", user.getEmail())     // Add Claim 1
+                .claim("name", user.getName())       // Add Claim 2
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(jwtSecretKey, SignatureAlgorithm.HS512) // Sign with our secret key
+                .signWith(jwtSecretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
