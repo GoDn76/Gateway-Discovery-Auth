@@ -30,7 +30,7 @@ services:
     environment:
       - JAVA_OPTS=-Xmx256m -Xms256m
       # 1. Tell Gateway to find Eureka on the VM's localhost (since Eureka exposes port 8761)
-      - EUREKA_SERVER_URL=http://service-discovery:8761/eureka/
+      - EUREKA_SERVER_URL=http://localhost:8761/eureka/
       - JWT_SECRET=bXlWZXJ5U2VjdXJlSldUU2VjcmV0S2V5Rm9yQWlTeW1wdG9tVHJhY2tlckFwcGxpY2F0aW9uMTIzNA==InChikitsalayAppAuthenticationThisWillBeHEHESecretYouCannotKnowIt
 
       # 2. (Optional) Force Gateway to run on Port 80 instead of 9090
