@@ -12,9 +12,12 @@ import java.security.Key;
 @Component
 public class JwtUtil {
 
-    // This MUST match the secret key in your User Service's application.yml
-    @Value("${jwt.secret}")
-    private String secret;
+
+    private final String secret;
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.secret = secret;
+    }
 
     /**
      * Validates the token signature and expiration.

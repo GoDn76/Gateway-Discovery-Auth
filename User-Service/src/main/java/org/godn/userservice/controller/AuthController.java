@@ -1,74 +1,79 @@
 package org.godn.userservice.controller;
 
+import jakarta.validation.Valid;
 import org.godn.userservice.payload.*;
 import org.godn.userservice.service.AuthService;
-import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+// Based on your Gateway config (Path=/auth/**, StripPrefix=1),
+// requests come here as just "/login", "/register", etc.
 @RequestMapping("/")
 public class AuthController {
 
     private final AuthService authService;
 
-    // We use constructor injection for the service
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
     /**
-     * Endpoint for user registration.
-     * Accessible via: POST http://localhost:9090/users/register
+     * Register a new user.
+     * Returns 201 CREATED on success.
      */
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDto registerDto) {
-        // @Valid triggers validation on the DTO
-        return authService.registerUser(registerDto);
+    public ResponseEntity<ApiResponseDto> registerUser(@Valid @RequestBody RegisterDto registerDto) {
+        ApiResponseDto response = authService.registerUser(registerDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
-     * Endpoint for verifying a user's email with an OTP.
-     * Accessible via: POST http://localhost:9090/users/verify-email
+     * Verify Email OTP.
+     * Returns 200 OK on success.
      */
     @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@Valid @RequestBody OtpVerificationDto verificationDto) {
-        return authService.verifyEmail(verificationDto);
+    public ResponseEntity<ApiResponseDto> verifyEmail(@Valid @RequestBody OtpVerificationDto verificationDto) {
+        return ResponseEntity.ok(authService.verifyEmail(verificationDto));
     }
 
     /**
-     * Endpoint for standard email/password login.
-     * Accessible via: POST <a href="http://localhost:9090/users/login">...</a>
+     * Login with Email/Password.
+     * Returns 200 OK with JWT Token on success.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto) {
-        return authService.loginUser(loginDto);
+    public ResponseEntity<AuthResponseDto> loginUser(@Valid @RequestBody LoginDto loginDto) {
+        return ResponseEntity.ok(authService.loginUser(loginDto));
     }
 
     /**
-     * Endpoint to request a password reset OTP.
-     * Accessible via: POST http://localhost:9090/users/request-password-reset
-     */
-    @PostMapping("/request-password-reset")
-    public ResponseEntity<?> requestPasswordReset(@Valid @RequestBody EmailDto emailDto) {
-        return authService.requestPasswordReset(emailDto);
-    }
-
-    /**
-     * Endpoint to set a new password using an OTP.
-     * Accessible via: POST http://localhost:9090/users/reset-password
-     */
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
-        return authService.resetPassword(resetPasswordDto);
-    }
-
-    /**
-     * Endpoint for Google Sign-In.
-     * Accessible via: POST http://localhost:9090/login/google
+     * Login with Google.
+     * Returns 200 OK with JWT Token on success.
      */
     @PostMapping("/login/google")
-    public ResponseEntity<?> loginWithGoogle(@Valid @RequestBody GoogleLoginDto googleLoginDto) {
-        return authService.loginWithGoogle(googleLoginDto);
+    public ResponseEntity<AuthResponseDto> loginWithGoogle(@Valid @RequestBody GoogleLoginDto googleLoginDto) {
+        return ResponseEntity.ok(authService.loginWithGoogle(googleLoginDto));
+    }
+
+    /**
+     * Request Password Reset OTP.
+     * Returns 200 OK.
+     */
+    @PostMapping("/request-password-reset")
+    public ResponseEntity<ApiResponseDto> requestPasswordReset(@Valid @RequestBody EmailDto emailDto) {
+        return ResponseEntity.ok(authService.requestPasswordReset(emailDto));
+    }
+
+    /**
+     * Reset Password using OTP.
+     * Returns 200 OK.
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponseDto> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
+        return ResponseEntity.ok(authService.resetPassword(resetPasswordDto));
     }
 }

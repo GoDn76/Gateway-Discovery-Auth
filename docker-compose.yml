@@ -1,9 +1,9 @@
-
 services:
   # --- 1. SERVICE DISCOVERY (Eureka) ---
   service-discovery:
+    restart: always
     # ⚠️ FIX: Match the folder name "ServiceDiscovery" exactly
-    build: 
+    build:
       context: ./ServiceDiscovery
       dockerfile: dockerfile  # Your screenshot shows lowercase 'd'
     container_name: service-discovery
@@ -22,7 +22,7 @@ services:
 
   # --- 2. API GATEWAY ---
   gateway-service:
-    build: 
+    build:
       context: ./GatewayService
       dockerfile: dockerfile  # Your screenshot shows lowercase 'd'
     container_name: gateway-service
@@ -30,9 +30,11 @@ services:
     environment:
       - JAVA_OPTS=-Xmx256m -Xms256m
       # 1. Tell Gateway to find Eureka on the VM's localhost (since Eureka exposes port 8761)
-      - EUREKA_SERVER_URL=http://localhost:8761/eureka/
+      - EUREKA_SERVER_URL=http://godn-gw.duckdns.org:8761/eureka/
+      - JWT_SECRET=bXlWZXJ5U2VjdXJlSldUU2VjcmV0S2V5Rm9yQWlTeW1wdG9tVHJhY2tlckFwcGxpY2F0aW9uMTIzNA==InChikitsalayAppAuthenticationThisWillBeHEHESecretYouCannotKnowIt
+
       # 2. (Optional) Force Gateway to run on Port 80 instead of 9090
-      - SERVER_PORT=80 
+      - SERVER_PORT=80
     depends_on:
       service-discovery:
         condition: service_healthy

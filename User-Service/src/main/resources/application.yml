@@ -65,9 +65,12 @@ eureka:
   instance:
 ##    prefer-ip-address: true # Use IP address instead of hostname
     # This forces a unique ID (e.g., "User-Service:abc123")
-    hostname: localhost # <--- Trick Eureka into using the tunnel
+    hostname: ${CONTAINER_APP_HOSTNAME:localhost}
+      # If on Azure (variable exists), use HTTPS/443. If local, use HTTP/8080.
+    non-secure-port-enabled: ${IS_LOCAL:true}
+    secure-port-enabled: ${IS_CLOUD:false}
+    secure-port: 443
     non-secure-port: 8080
-    prefer-ip-address: false
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 

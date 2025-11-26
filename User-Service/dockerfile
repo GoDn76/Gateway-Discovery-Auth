@@ -1,0 +1,15 @@
+# Use a lightweight Java runtime
+FROM eclipse-temurin:21-jdk-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the built JAR file into the container
+# (Ensure you have run 'mvn clean package' first!)
+COPY target/*.jar app.jar
+
+# Expose the port this service runs on
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
