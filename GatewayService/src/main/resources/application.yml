@@ -23,6 +23,15 @@ spring:
               filters:
                 - StripPrefix=1
                 - AuthenticationFilter # <--- The Bouncer is here!
+
+            # --- 2. Protected User Routes (Profile/Update) ---
+            - id: uplaod-service
+              uri: lb://upload-service
+              predicates:
+                - Path=/jsd/**
+              filters:
+                - StripPrefix=1
+                - AuthenticationFilter # <--- The Bouncer is here!
 jwt:
   secret: ${JWT_SECRET}
   expiration-ms: 86400000
