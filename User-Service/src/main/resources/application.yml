@@ -63,8 +63,6 @@ eureka:
     service-url:
       defaultZone: http://godn-gw.duckdns.org:8761/eureka/
   instance:
-##    prefer-ip-address: true # Use IP address instead of hostname
-    # This forces a unique ID (e.g., "User-Service:abc123")
     hostname: ${CONTAINER_APP_HOSTNAME:localhost}
       # If on Azure (variable exists), use HTTPS/443. If local, use HTTP/8080.
     non-secure-port-enabled: ${IS_LOCAL:true}
