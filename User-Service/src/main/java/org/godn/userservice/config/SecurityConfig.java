@@ -23,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
 //                // 1. CORS Configuration -> Using in Gateway no need here
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 // 2. Disable CSRF (Not needed for stateless APIs)
                 .csrf(AbstractHttpConfigurer::disable)
