@@ -4,53 +4,55 @@ server:
 spring:
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            # --- 1. Public Auth Routes (Login/Register) ---
-            - id: user-service-route
-              uri: lb://user-service
-              predicates:
-                - Path=/auth/**
-              filters:
-                - StripPrefix=1
+      # --- 1. ROUTE CONFIGURATION ---
+      # NOTICE: 'routes' is directly under 'gateway'
+      routes:
+        # A. Public Auth Routes (Login/Register)
+        - id: user-service-route
+          uri: lb://user-service
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
 
-            # --- 2. Protected User Routes (Profile/Update) ---
-            - id: user-service-protected
-              uri: lb://user-service
-              predicates:
-                - Path=/user/**
-              filters:
-                - StripPrefix=1
-                - AuthenticationFilter # <--- The Bouncer is here!
+        # B. Protected User Routes (Profile/Update)
+        - id: user-service-protected
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+            - AuthenticationFilter # Custom Filter Bean
 
-            # --- 2. Protected upload Routes ---
-            - id: upload-service
-              uri: lb://upload-service
-              predicates:
-                - Path=/jsd/**
-              filters:
-                - StripPrefix=1
-                - AuthenticationFilter # <--- The Bouncer is here!
-          # Global Cors setup
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                          allowedOrigins: "*"   # Allow your frontend URL
-                          allowedMethods:
-                            - GET
-                            - POST
-                            - PUT
-                            - DELETE
-                            - OPTIONS
-                          allowedHeaders: "*"
+        # C. Protected Upload Routes (Deployments)
+        - id: upload-service
+          uri: lb://upload-service
+          predicates:
+            - Path=/jsd/** # Frontend calls /jsd/deployments
+          filters:
+            - StripPrefix=1      # Service receives /deployments
+            - AuthenticationFilter
+
+      # --- 2. GLOBAL CORS CONFIGURATION ---
+      # NOTICE: 'globalcors' is a sibling of 'routes', directly under 'gateway'
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"   # Allow your frontend URL
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
 jwt:
   secret: ${JWT_SECRET}
   expiration-ms: 86400000
 
-
 eureka:
   client:
     service-url:
-      # This address is still correct
-      defaultZone: ${EUREKA_SERVER_URL:http://godn-gw.duckdns.org:8761/eureka/}
+      # Use localhost because Gateway & Eureka are on the same VM
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
