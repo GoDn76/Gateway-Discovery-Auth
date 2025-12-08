@@ -56,3 +56,9 @@ eureka:
     service-url:
       # Use localhost because Gateway & Eureka are on the same VM
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
