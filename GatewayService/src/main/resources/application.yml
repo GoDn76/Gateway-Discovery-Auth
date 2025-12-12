@@ -4,48 +4,45 @@ server:
 spring:
   cloud:
     gateway:
-      # --- 1. ROUTE CONFIGURATION ---
-      # NOTICE: 'routes' is directly under 'gateway'
-      routes:
-        # A. Public Auth Routes (Login/Register)
-        - id: user-service-route
-          uri: lb://user-service
-          predicates:
-            - Path=/auth/**
-          filters:
-            - StripPrefix=1
+      server:
+        webflux:
+          routes:
+            # A. Public Auth Routes (Login/Register)
+                    - id: user-service-route
+                      uri: lb://user-service
+                      predicates:
+                        - Path=/auth/**
+                      filters:
+                        - StripPrefix=1
 
-        # B. Protected User Routes (Profile/Update)
-        - id: user-service-protected
-          uri: lb://user-service
-          predicates:
-            - Path=/user/**
-          filters:
-            - StripPrefix=1
-            - AuthenticationFilter # Custom Filter Bean
+                    # B. Protected User Routes (Profile/Update)
+                    - id: user-service-protected
+                      uri: lb://user-service
+                      predicates:
+                        - Path=/user/**
+                      filters:
+                        - StripPrefix=1
+                        - AuthenticationFilter # Custom Filter Bean
 
-        # C. Protected Upload Routes (Deployments)
-        - id: upload-service
-          uri: lb://upload-service
-          predicates:
-            - Path=/jsd/** # Frontend calls /jsd/deployments
-          filters:
-            - StripPrefix=1      # Service receives /deployments
-            - AuthenticationFilter
-
-      # --- 2. GLOBAL CORS CONFIGURATION ---
-      # NOTICE: 'globalcors' is a sibling of 'routes', directly under 'gateway'
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"   # Allow your frontend URL
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
+                    # C. Protected Upload Routes (Deployments)
+                    - id: upload-service
+                      uri: lb://upload-service
+                      predicates:
+                        - Path=/jsd/** # Frontend calls /jsd/deployments
+                      filters:
+                        - StripPrefix=1      # Service receives /deployments
+                        - AuthenticationFilter
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                          allowedOrigins: "*"   # Allow your frontend URL
+                          allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - DELETE
+                            - OPTIONS
+                          allowedHeaders: "*"
 
 jwt:
   secret: ${JWT_SECRET}
