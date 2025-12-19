@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerificationToken {
+public class    VerificationToken {
 
     // Use a UUID for the primary key, just like in our User model
     @Id
