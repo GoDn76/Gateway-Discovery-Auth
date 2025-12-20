@@ -87,15 +87,17 @@ spring:
                         - Path=/auth/**
                       filters:
                         - StripPrefix=1
-                        - name: CircuitBreaker
-                          args:
-                            name: userServiceBreaker
-                            fallbackUri: forward:/fallback/auth
                         - name: RequestRateLimiter
                           args:
                             redis-rate-limiter.replenishRate: 10  # 10 req/sec (steady)
                             redis-rate-limiter.burstCapacity: 20  # Allow burst of 20
                             key-resolver: "#{@userKeyResolver}"   # Bean we will define below
+
+
+                        - name: CircuitBreaker
+                          args:
+                            name: userServiceBreaker
+                            fallbackUri: forward:/fallback/auth
 
                     # B. Protected User Routes (Profile/Update)
                     - id: user-service-protected
@@ -119,15 +121,15 @@ spring:
                       filters:
                         - StripPrefix=1
                         - AuthenticationFilter
-                        - name: CircuitBreaker
-                          args:
-                            name: uploadServiceBreaker
-                            fallbackUri: forward:/fallback/deploy
                         - name: RequestRateLimiter
                           args:
                             redis-rate-limiter.replenishRate: 2   # Only 2 req/sec (prevent spamming deploy)
                             redis-rate-limiter.burstCapacity: 5
                             key-resolver: "#{@userKeyResolver}"
+                        - name: CircuitBreaker
+                          args:
+                            name: uploadServiceBreaker
+                            fallbackUri: forward:/fallback/deploy
 
 # --- RESILIENCE4J CONFIGURATION ---
 resilience4j:
