@@ -20,6 +20,13 @@ services:
     networks:
       - symptom-network
 
+  redis:  
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - spring-cloud-network  # <--- MUST match Gateway's network
   # --- 2. API GATEWAY ---
   gateway-service:
     build:
