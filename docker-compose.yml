@@ -41,6 +41,7 @@ services:
       - JWT_SECRET=bXlWZXJ5U2VjdXJlSldUU2VjcmV0S2V5Rm9yQWlTeW1wdG9tVHJhY2tlckFwcGxpY2F0aW9uMTIzNA==InChikitsalayAppAuthenticationThisWillBeHEHESecretYouCannotKnowIt
       - SPRING_DATA_REDIS_HOST=redis
       - SERVER_PORT=9090
+      - JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true
     depends_on:
       service-discovery:
         condition: service_healthy
